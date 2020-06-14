@@ -21,47 +21,6 @@ namespace LinqCwiczenia
         {
             InitializeComponent();
             LoadData();
-
-            //LINQ to SQL, EF
-            //LINQ to XML
-            //LINQ - Language Integrated Query - IEnumerable<T>
-
-
-            //1. Extension methods
-            string str = "s1234";
-            if (str.IsPjatkIndex())
-            {
-
-            }
-
-            //2. Anonymous types
-            var anon = new
-            {
-                FirstName="Jan",
-                LastName="Kowalski"
-            };
-
-            //System.Dynamic
-            //dynamic d = "Ala";
-            //d = 10;
-
-            //3. Wyrażenia Lambda/Anonimowe metody
-            // delegate -> function pointer
-            // event
-            //Action, Function
-            List<int> nums2 = new List<int>() { 3, 4, 2, 3, 1, 2, 3 };
-            //var res = Filter(nums2, i => {
-            //    //...
-            //    return i % 2 == 1;
-            //});
-            var res = nums2.Filter(i => i % 2 == 0);
-
-
-        }
-
-        public static bool sdialjmlmaldakmdlsamdka(int i)
-        {
-            return i % 2 == 1;
         }
 
         private void LoadData()
@@ -298,50 +257,7 @@ namespace LinqCwiczenia
         /// </summary>
         private void Przyklad3Button_Click(object sender, EventArgs e)
         {
-            var min = Emps.Min(emp => emp.Salary);
-            var max = Emps.Max(emp => emp.Salary);
-            var avg = Emps.Average(emp => emp.Salary);
-
-            var groupBy = Emps.GroupBy(emp => emp.Deptno);
-
-            var joinResult = Emps
-                    .Join(Depts, emp => emp.Deptno, dept => dept.Deptno, (emp, dept) => new
-                    {
-                        emp,
-                        dept
-                    });
-
-            //map, reduce, filter
-            //select, aggregate, where
-
-            var p1 = Emps.All(emp => emp.Salary > 2000);
-            var p2 = Emps.Any(emp => emp.Salary > 2000);
-
-            var p3 = Emps.Count(emp => emp.Salary > 2000);
-
-            //var p4 = Emps.Skip(10).Take(10);
-
-            var p5 = Emps.Distinct();
-
-            var p6 = Emps.Sum(emp => emp.Salary);
-
-            var p7 = Emps.First(); //EX
-            var p7_2 = Emps.FirstOrDefault(); //null
-
-            var p8 = Emps.Single();
-            var p8_2 = Emps.SingleOrDefault();
-
-            var p9 = Emps
-                        .Select(emp => emp.Salary)
-                        .Aggregate((res, next) => res+next);
-
-            //Dynamic LINQ - Emps.OrderBy(zmienna)
-            //PLINQ - Parallel LINQ
-            //Emps.AsParallel() // ThreadPool
-
-
-            int g = 0;
-            //WynikTextBox.Text = result + "";
+            WynikTextBox.Text = Emps.MaxSalary() + "";
         }
 
         /// <summary>
@@ -349,8 +265,10 @@ namespace LinqCwiczenia
         /// </summary>
         private void Przyklad4Button_Click(object sender, EventArgs e)
         {
-
-            //ResultsDataGridView.DataSource = result;
+            var maxSalary = Emps.MaxSalary();
+            var result = Emps.Where(emp => emp.Salary == maxSalary);
+            
+            ResultsDataGridView.DataSource = result.ToList();
         }
 
         /// <summary>
@@ -358,8 +276,8 @@ namespace LinqCwiczenia
         /// </summary>
         private void Przyklad5Button_Click(object sender, EventArgs e)
         {
-
-            //ResultsDataGridView.DataSource = result;
+            var result = Emps.Select(emp => new {Nazwisko = emp.Ename, Zawod = emp.Job});
+            ResultsDataGridView.DataSource = result.ToList();
         }
 
         /// <summary>
@@ -369,8 +287,15 @@ namespace LinqCwiczenia
         /// </summary>
         private void Przyklad6Button_Click(object sender, EventArgs e)
         {
-
-            //ResultsDataGridView.DataSource = result;
+            var result = Emps.Join(
+                Depts,
+                emp => emp.Deptno,
+                dept => dept.Deptno,
+                (emp, dept) => new
+                {
+                    emp.Ename, emp.Job, dept.Dname
+                });
+            ResultsDataGridView.DataSource = result.ToList();
         }
 
         /// <summary>
@@ -378,8 +303,10 @@ namespace LinqCwiczenia
         /// </summary>
         private void Przyklad7Button_Click(object sender, EventArgs e)
         {
-
-            //ResultsDataGridView.DataSource = result;
+            var result = Emps
+                .GroupBy(emp => emp.Job)
+                .Select(group => new {Praca = group.Key, LiczbaPracownikow = group.Count()});
+            ResultsDataGridView.DataSource = result.ToList();
         }
 
         /// <summary>
@@ -388,12 +315,14 @@ namespace LinqCwiczenia
         /// </summary>
         private void Przyklad8Button_Click(object sender, EventArgs e)
         {
-            /*
+            var LINQ = Emps.Any(emp => "Backend programmer".Equals(emp.Job));
+
+            
             if (LINQ)
             {
                 WynikTextBox.Text = "Backend programmer istnieje w kolekcji";
             }
-             */
+            
         }
 
         /// <summary>
@@ -402,8 +331,8 @@ namespace LinqCwiczenia
         /// </summary>
         private void Przyklad9Button_Click(object sender, EventArgs e)
         {
-
-            //ResultsDataGridView.DataSource = result;
+            var result = Emps.Where(emp => "Frontend programmer".Equals(emp.Job)).Aggregate((emp1, emp2) => emp1.HireDate > emp2.HireDate ? emp1 : emp2);
+            WynikTextBox.Text = result + "";
         }
 
         /// <summary>
@@ -413,12 +342,11 @@ namespace LinqCwiczenia
         /// </summary>
         private void Przyklad10Button_Click(object sender, EventArgs e)
         {
-
-            //ResultsDataGridView.DataSource = result;
+            var result = Emps.Select(emp => new {emp.Ename, emp.Job, emp.HireDate}).ToList();
+            result.Add(new {
+                Ename = "Brak wartości", Job = (string)null, HireDate = (DateTime?)null
+            });
+            ResultsDataGridView.DataSource = result;
         }
-
-
-
-
     }
 }

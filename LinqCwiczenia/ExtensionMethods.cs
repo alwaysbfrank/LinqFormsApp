@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LinqCwiczenia.Models;
 
 namespace LinqCwiczenia
 {
@@ -27,6 +28,11 @@ namespace LinqCwiczenia
             }
 
             return res;
+        }
+
+        public static int MaxSalary(this IEnumerable<Emp> emps)
+        {
+            return emps.Max(emp => emp.Salary);
         }
     }
 }
